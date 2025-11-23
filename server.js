@@ -36,6 +36,22 @@ app.get('/', (req, res) => {
     });
 });
 
+// GET all documents from a collection
+app.get('/collection/:collectionName', (req, res, next) => {
+    req.collection.find({}).toArray((e, results) => {
+        if (e) return next(e);
+        res.send(results);
+    });
+});
+
+// GET single document by ID
+app.get('/collection/:collectionName/:id', (req, res, next) => { 
+    req.collection.findOne({ _id: new ObjectID(req.params.id) }, (e, result) => { 
+        if (e) return next(e);
+        res.send(result);
+    }); 
+});
+
 app.param('collectionName', (req, res, next, collectionName) => {
     req.collection = db.collection(collectionName);
     return next();
