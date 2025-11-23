@@ -111,6 +111,22 @@ app.delete('/collection/:collectionName/:id', (req, res, next) => {
         }
     ); 
 });
+
+// Search endpoint with regex filtering
+app.get('/search/:collectionName', (req, res, next) => {
+    const searchQuery = req.query.q;
+    req.collection = db.collection(req.params.collectionName);
+    
+    req.collection.find({
+        $or: [
+            { subject: { $regex: searchQuery, $options: 'i' } },
+            { location: { $regex: searchQuery, $options: 'i' } }
+        ]
+    }).toArray((e, results) => {
+        if (e) return next(e);
+        res.send(results);
+    });
+});
  
 app.listen(port, () => {
     console.log(`Express.js API server running at localhost:${port}`);
