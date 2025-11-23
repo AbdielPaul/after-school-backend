@@ -12,16 +12,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// CORS middleware
+// CORS middleware - UPDATED to allow GitHub Pages
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Allows any domain
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT,DELETE');
     res.setHeader('Access-Control-Allow-Headers', "Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     next();
 });
 
-// MongoDB setup
+
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
  
@@ -35,27 +35,16 @@ MongoClient.connect('mongodb+srv://abdielpaul29_db_user:SNNNgZ4njPF3WqKS@cluster
     db = client.db('webstore');
     console.log('Connected to MongoDB');
 });
+ 
 
-// Root route
-app.get('/', (req, res) => {
-    res.json({ 
-        message: 'Webstore API is running',
-        version: '1.0.0',
-        endpoints: {
-            lessons: '/collection/lessons',
-            orders: '/collection/orders',
-            search: '/search/lessons?q=query'
-        }
-    });
-});
 
 // Collection parameter middleware
 app.param('collectionName', (req, res, next, collectionName) => {
     req.collection = db.collection(collectionName);
     return next();
 });
-
-// GET all documents from a collection
+ 
+//  GET all lessons (for loading initial data)
 app.get('/collection/:collectionName', (req, res, next) => {
     req.collection.find({}).toArray((e, results) => {
         if (e) return next(e);
@@ -63,7 +52,7 @@ app.get('/collection/:collectionName', (req, res, next) => {
     });
 });
 
-// POST new document to collection
+//  POST new order
 app.post('/collection/:collectionName', (req, res, next) => {
     req.collection.insertOne(req.body, (e, result) => {
         if (e) return next(e);
@@ -75,7 +64,7 @@ app.post('/collection/:collectionName', (req, res, next) => {
     });
 });
 
-// GET single document by ID
+//  GET single document by ID
 app.get('/collection/:collectionName/:id', (req, res, next) => { 
     req.collection.findOne({ _id: new ObjectID(req.params.id) }, (e, result) => { 
         if (e) return next(e);
@@ -83,7 +72,7 @@ app.get('/collection/:collectionName/:id', (req, res, next) => {
     }); 
 });
 
-// PUT - Update document by ID
+//  UPDATE product
 app.put('/collection/:collectionName/:id', (req, res, next) => { 
     req.collection.updateOne( 
         {_id: new ObjectID(req.params.id)}, 
@@ -98,7 +87,7 @@ app.put('/collection/:collectionName/:id', (req, res, next) => {
     ); 
 });
 
-// DELETE document by ID
+//  DELETE document
 app.delete('/collection/:collectionName/:id', (req, res, next) => { 
     req.collection.deleteOne( 
         {_id: new ObjectID(req.params.id)}, 
@@ -112,7 +101,7 @@ app.delete('/collection/:collectionName/:id', (req, res, next) => {
     ); 
 });
 
-// Search endpoint with regex filtering
+//  Search lessons endpoint
 app.get('/search/:collectionName', (req, res, next) => {
     const searchQuery = req.query.q;
     req.collection = db.collection(req.params.collectionName);
@@ -126,6 +115,12 @@ app.get('/search/:collectionName', (req, res, next) => {
         if (e) return next(e);
         res.send(results);
     });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: err.message });
 });
  
 app.listen(port, () => {
