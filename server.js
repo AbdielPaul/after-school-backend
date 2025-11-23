@@ -82,6 +82,35 @@ app.get('/collection/:collectionName/:id', (req, res, next) => {
         res.send(result);
     }); 
 });
+
+// PUT - Update document by ID
+app.put('/collection/:collectionName/:id', (req, res, next) => { 
+    req.collection.updateOne( 
+        {_id: new ObjectID(req.params.id)}, 
+        {$set: req.body}, 
+        (e, result) => { 
+            if (e) return next(e);
+            res.json({
+                success: result.modifiedCount === 1,
+                msg: result.modifiedCount === 1 ? 'success' : 'error'
+            });
+        }
+    ); 
+});
+
+// DELETE document by ID
+app.delete('/collection/:collectionName/:id', (req, res, next) => { 
+    req.collection.deleteOne( 
+        {_id: new ObjectID(req.params.id)}, 
+        (e, result) => { 
+            if (e) return next(e);
+            res.json({
+                success: result.deletedCount === 1,
+                msg: result.deletedCount === 1 ? 'success' : 'error'
+            });
+        }
+    ); 
+});
  
 app.listen(port, () => {
     console.log(`Express.js API server running at localhost:${port}`);
