@@ -36,6 +36,11 @@ app.get('/', (req, res) => {
     });
 });
 
+app.param('collectionName', (req, res, next, collectionName) => {
+    req.collection = db.collection(collectionName);
+    return next();
+});
+
 app.listen(port, () => {
     console.log(`Express.js API server running at localhost:${port}`);
     
