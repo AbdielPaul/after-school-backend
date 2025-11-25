@@ -12,6 +12,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(function(req, res, next) {
+console.log("Request IP: " + req.url);
+console.log("Request date: " + new Date());
+next();
+});
+
 // CORS middleware - UPDATED to allow GitHub Pages
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*'); // Allows any domain
