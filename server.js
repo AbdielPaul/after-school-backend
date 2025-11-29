@@ -6,19 +6,13 @@ app.use(express.json());
 const port = process.env.PORT || 3000;
 
 // Global request logger
-app.use((req, res, next) => {
-  const time = new Date().toISOString();
-  console.log(`[API CALL] ${time} - ${req.method} ${req.originalUrl}`);
-  next();
-});
-
 app.use(function(req, res, next) {
-console.log("Request IP: " + req.url);
-console.log("Request date: " + new Date());
-next();
+    console.log("Request IP: " + req.url);
+    console.log("Request date: " + new Date());
+    next();
 });
 
-// CORS middleware - UPDATED to allow GitHub Pages
+// CORS middleware 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*'); // Allows any domain
     res.setHeader('Access-Control-Allow-Credentials', 'true');
