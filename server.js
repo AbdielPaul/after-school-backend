@@ -36,6 +36,18 @@ MongoClient.connect('mongodb+srv://abdielpaul29_db_user:SNNNgZ4njPF3WqKS@cluster
     console.log('Connected to MongoDB');
 });
  
+// Static image middleware
+app.use('/images', express.static(path.join(__dirname, 'images'), {
+    fallthrough: true   // Allows custom 404 handling
+}));
+
+// Custom error handler for missing images
+app.use('/images', (req, res) => {
+    res.status(404).json({
+        error: "Image not found",
+        file: req.originalUrl
+    });
+});
 
 
 // Collection parameter middleware
